@@ -21,7 +21,10 @@ function App() {
   const fetchContacts = async () => {
     try {
       // Gọi API GET của Backend (đang chạy ở port 5000)
-      const response = await axios.get("http://localhost:5000/api/contact");
+      // deploy lên render nên đổi lại URL (https://api-cuongdao-projecttuan02.onrender.com)
+      const response = await axios.get(
+        "https://api-cuongdao-projecttuan02.onrender.com/api/contact"
+      );
       // Backend trả về mảng dữ liệu -> Lưu vào state để React vẽ lại bảng
       setContactList(response.data);
     } catch (error) {
@@ -56,7 +59,10 @@ function App() {
 
     try {
       // Gọi API POST để gửi dữ liệu xuống Backend
-      await axios.post("http://localhost:5000/api/contact", formData);
+      await axios.post(
+        "https://api-cuongdao-projecttuan02.onrender.com/api/contact",
+        formData
+      );
 
       setMessage("Gửi thành công!");
 
