@@ -1,0 +1,161 @@
+/* App.css */
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f0f2f5;
+  margin: 0;
+
+  /* CẤU HÌNH CĂN GIỮA MÀN HÌNH */
+  min-height: 100vh;
+  /* Chiều cao ít nhất bằng màn hình */
+  display: flex;
+  /* Dùng Flexbox */
+  justify-content: center;
+  /* Căn giữa chiều ngang */
+  align-items: center;
+  /* Căn giữa chiều dọc */
+  padding: 40px 20px;
+  /* Khoảng cách an toàn để không bị dính sát lề khi cuộn */
+}
+
+.container {
+  width: 100%;
+  max-width: 850px;
+  /* Giới hạn chiều rộng cho gọn */
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  /* Khoảng cách giữa Form và Table */
+}
+
+/* --- STYLE CHO FORM --- */
+.form-card {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  /* Bo góc tròn hơn */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  /* Đổ bóng mịn */
+}
+
+h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  font-size: 24px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #34495e;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #eef2f7;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #3498db;
+  outline: none;
+  background-color: #fbfdff;
+}
+
+textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 10px;
+}
+
+.btn-submit:hover {
+  background-color: #2980b9;
+  transform: translateY(-1px);
+}
+
+.message {
+  text-align: center;
+  margin-top: 20px;
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 6px;
+  background-color: #e8f5e9;
+  color: #27ae60;
+}
+
+/* --- STYLE CHO TABLE --- */
+.table-card {
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  /* Cho phép cuộn ngang nếu màn hình bé */
+}
+
+h3 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f0f2f5;
+  padding-bottom: 15px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* CĂN GIỮA CHỮ TRONG BẢNG */
+th,
+td {
+  padding: 15px;
+  text-align: center;
+  /* Quan trọng: Căn giữa nội dung ô */
+  border-bottom: 1px solid #f1f1f1;
+}
+
+th {
+  background-color: #f8f9fa;
+  color: #555;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover {
+  background-color: #f8faff;
+  /* Hiệu ứng khi di chuột vào dòng */
+}
