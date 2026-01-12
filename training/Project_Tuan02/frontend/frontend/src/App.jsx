@@ -53,7 +53,7 @@ function App() {
 
     // Validate: Kiểm tra xem có bỏ trống không
     if (!formData.fullName || !formData.email || !formData.phone) {
-      setMessage("⚠️ Vui lòng điền đầy đủ thông tin bắt buộc!");
+      setMessage("Vui lòng điền đầy đủ thông tin bắt buộc!");
       return;
     }
 

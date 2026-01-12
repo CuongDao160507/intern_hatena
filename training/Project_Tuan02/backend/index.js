@@ -2,6 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
 
@@ -10,7 +11,7 @@ app.use(cors()); // Cho phép Frontend gọi API
 app.use(express.json()); // Cho phép đọc dữ liệu JSON gửi lên từ Frontend
 
 // Kết nối MongoDB
-mongoose.connect('mongodb+srv://cuongDao1605:160507@projecttuan02.8w8n109.mongodb.net/?appName=projectTuan02')
+mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("Đã kết nối MongoDB thành công!"))
     .catch(err => console.log("Lỗi kết nối:", err));
 
