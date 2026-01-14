@@ -2,9 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db'); // Import kết nối DB
 const formRoutes = require('./routes/formRoutes'); // Import routes
+require('dotenv').config(); // Load biến môi trường
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // 1. Cấu hình middleware
 app.use(cors());
