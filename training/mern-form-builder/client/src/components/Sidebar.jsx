@@ -1,17 +1,26 @@
-import React from "react";
-import { useDraggable } from "@dnd-kit/core"; // 1. Import hook Kéo
-import { BsTextParagraph, BsCardText } from "react-icons/bs";
-import { MdOutlineRadioButtonChecked, MdCheckBox } from "react-icons/md";
+import React, { useState } from "react";
+import { useDraggable } from "@dnd-kit/core";
+import {
+  BsTextParagraph,
+  BsCardText,
+  BsPerson,
+  BsEnvelope,
+  BsTelephone,
+  BsKey,
+} from "react-icons/bs";
+import {
+  MdOutlineRadioButtonChecked,
+  MdCheckBox,
+  MdSearch,
+} from "react-icons/md";
 
-// Component con: Đại diện cho 1 nút có thể kéo đi
+// Component con Draggable (Giữ nguyên)
 const SidebarItem = ({ tool }) => {
-  // useDraggable giúp tạo ra các thuộc tính để gắn vào thẻ HTML
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: tool.type,
-    data: tool, // Gửi kèm dữ liệu của tool này để lúc thả còn biết là thả cái gì
+    data: tool,
   });
 
-  // Nếu đang kéo thì nút sẽ dịch chuyển theo chuột (transform)
   const style = transform
     ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
@@ -20,11 +29,11 @@ const SidebarItem = ({ tool }) => {
 
   return (
     <div
-      ref={setNodeRef} // Gắn ref để thư viện biết đây là vật thể kéo
-      {...listeners} // Gắn sự kiện chuột
-      {...attributes} // Gắn thuộc tính ARIA
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
       style={style}
-      className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg cursor-grab hover:bg-blue-50 hover:border-blue-500 shadow-sm z-50 touch-none"
+      className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg cursor-grab hover:bg-blue-50 hover:border-blue-500 shadow-sm z-50 touch-none mb-3"
     >
       <span className="text-xl text-gray-600">{tool.icon}</span>
       <span className="font-medium text-gray-700">{tool.label}</span>
@@ -33,9 +42,16 @@ const SidebarItem = ({ tool }) => {
 };
 
 const Sidebar = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Danh sách công cụ mở rộng
   const tools = [
     { type: "text", label: "Input Text", icon: <BsTextParagraph /> },
     { type: "textarea", label: "Text Area", icon: <BsCardText /> },
+    { type: "name", label: "Full Name", icon: <BsPerson /> }, // Mới
+    { type: "email", label: "Email", icon: <BsEnvelope /> }, // Mới
+    { type: "password", label: "Password", icon: <BsKey /> }, // Mới
+    { type: "phone", label: "Phone Number", icon: <BsTelephone /> }, // Mới
     {
       type: "radio",
       label: "Radio Group",
@@ -44,14 +60,37 @@ const Sidebar = () => {
     { type: "checkbox", label: "Checkbox", icon: <MdCheckBox /> },
   ];
 
+  // Logic lọc theo từ khóa tìm kiếm
+  const filteredTools = tools.filter((tool) =>
+    tool.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="w-64 bg-white border-r border-gray-200 p-4 h-screen shadow-md z-10">
-      <h2 className="text-lg font-bold mb-4 text-gray-700">Toolbox</h2>
-      <div className="grid grid-cols-1 gap-3">
-        {tools.map((tool) => (
-          // Gọi component con draggable ở đây
-          <SidebarItem key={tool.type} tool={tool} />
-        ))}
+    <div className="w-64 bg-white border-r border-gray-200 h-screen shadow-md flex flex-col">
+      <div className="p-4 border-b border-gray-100">
+        <h2 className="text-lg font-bold mb-3 text-gray-700">Toolbox</h2>
+
+        {/* Thanh tìm kiếm */}
+        <div className="relative">
+          <MdSearch className="absolute left-2 top-2.5 text-gray-400 text-lg" />
+          <input
+            type="text"
+            placeholder="Tìm kiếm..."
+            className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-blue-500"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="p-4 overflow-y-auto flex-1">
+        {filteredTools.length > 0 ? (
+          filteredTools.map((tool) => (
+            <SidebarItem key={tool.type} tool={tool} />
+          ))
+        ) : (
+          <p className="text-center text-gray-400 text-sm">Không tìm thấy</p>
+        )}
       </div>
     </div>
   );
