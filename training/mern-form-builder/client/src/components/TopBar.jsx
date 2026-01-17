@@ -1,10 +1,15 @@
 import React from "react";
-import { FiSave, FiDownload, FiUpload } from "react-icons/fi"; // Cần cài icon nếu thiếu
+import { FiSave, FiDownload, FiUpload } from "react-icons/fi"; // Lấy 3 icon từ react-icons (feather)
 
+// ({ onSave, onExport, onImport }): kỹ thuật Destructuring Props.
+// TopBar là một "component câm" (Dumb Component).
+// Nó không biết lưu form như thế nào, cũng không biết xuất file ra sao.
+// Nó chỉ nhận 3 hàm từ cha (App.jsx) truyền xuống.
+// Khi người dùng bấm nút, nó sẽ bấm cái điều khiển đó để App.jsx xử lý.
 const TopBar = ({ onSave, onExport, onImport }) => {
   return (
     <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-20">
-      {/* Logo hoặc Tên */}
+      {/* Logo và Tên */}
       <div className="flex items-center gap-2">
         <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
           F

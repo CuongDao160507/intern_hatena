@@ -1,4 +1,5 @@
 import React from "react";
+// Import các icon từ react-icons (material)
 import { MdClose, MdDelete, MdAdd } from "react-icons/md";
 
 const PropertiesPanel = ({
@@ -10,23 +11,27 @@ const PropertiesPanel = ({
   if (!selectedElement) return null;
 
   const handleStyleChange = (key, value) => {
+    // Tạo bản sao của style cũ và ghi đè thuộc tính mới vào
     const newStyle = { ...selectedElement.style, [key]: value };
+    // Gọi hàm update của cha, báo cập nhật trường "style"
     updateElement(selectedElement.id, "style", newStyle);
   };
 
   // Logic Options (Radio/Checkbox)
   const handleOptionChange = (index, value) => {
-    const newOptions = [...selectedElement.options];
-    newOptions[index] = value;
-    updateElement(selectedElement.id, "options", newOptions);
+    const newOptions = [...selectedElement.options]; // Copy mảng options cũ
+    newOptions[index] = value; // Sửa phần tử tại vị trí index
+    updateElement(selectedElement.id, "options", newOptions); // Cập nhật lại
   };
 
   const addOption = () => {
+    // Nếu options chưa tồn tại thì tạo mảng rỗng, sau đó thêm "New Option" vào cuối
     const newOptions = [...(selectedElement.options || []), `New Option`];
     updateElement(selectedElement.id, "options", newOptions);
   };
 
   const removeOption = (index) => {
+    // Lọc bỏ phần tử tại vị trí index
     const newOptions = selectedElement.options.filter((_, i) => i !== index);
     updateElement(selectedElement.id, "options", newOptions);
   };
@@ -43,7 +48,7 @@ const PropertiesPanel = ({
         </button>
       </div>
 
-      {/* 1. Tên nhãn (Label) */}
+      {/* Tên nhãn (Label) */}
       <div className="mb-5">
         <label className="block text-sm font-semibold text-gray-700 mb-2">
           Tên nhãn (Label)
@@ -58,8 +63,7 @@ const PropertiesPanel = ({
         />
       </div>
 
-      {/* 2. MỚI: Tùy chỉnh Placeholder (Văn bản gợi ý) */}
-      {/* Chỉ hiện với các ô nhập liệu, không hiện với Radio/Checkbox */}
+      {/* Tùy chỉnh Placeholder (Văn bản gợi ý) */}
       {!["radio", "checkbox"].includes(selectedElement.type) && (
         <div className="mb-5">
           <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -77,7 +81,7 @@ const PropertiesPanel = ({
         </div>
       )}
 
-      {/* 3. Logic Options (Radio/Checkbox) */}
+      {/* Logic Options (Radio/Checkbox) */}
       {(selectedElement.type === "radio" ||
         selectedElement.type === "checkbox") && (
         <div className="mb-5 border-t border-b border-gray-100 py-4">
@@ -112,7 +116,7 @@ const PropertiesPanel = ({
 
       <hr className="my-4 border-gray-100" />
 
-      {/* 4. Màu viền */}
+      {/* Màu viền */}
       <div className="mb-5">
         <label className="block text-sm font-semibold text-gray-700 mb-2">
           Màu viền
@@ -127,7 +131,7 @@ const PropertiesPanel = ({
         </div>
       </div>
 
-      {/* 5. KHÔI PHỤC: Bo góc (Border Radius) */}
+      {/* Bo góc (Border Radius) */}
       <div className="mb-5">
         <label className="block text-sm font-semibold text-gray-700 mb-2">
           Bo góc: {parseInt(selectedElement.style?.borderRadius || 0)}px
@@ -144,7 +148,7 @@ const PropertiesPanel = ({
         />
       </div>
 
-      {/* 6. KHÔI PHỤC: Độ rộng (Width) */}
+      {/* Độ rộng (Width) */}
       <div className="mb-5">
         <label className="block text-sm font-semibold text-gray-700 mb-2">
           Độ rộng

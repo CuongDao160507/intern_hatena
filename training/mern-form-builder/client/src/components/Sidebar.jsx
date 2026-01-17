@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
+
+// Import các icon từ react-icons (boostrap)
 import {
   BsTextParagraph,
   BsCardText,
@@ -8,6 +10,8 @@ import {
   BsTelephone,
   BsKey,
 } from "react-icons/bs";
+
+// Import các icon từ react-icons (material)
 import {
   MdOutlineRadioButtonChecked,
   MdCheckBox,
@@ -16,11 +20,13 @@ import {
 
 // Component con Draggable (Giữ nguyên)
 const SidebarItem = ({ tool }) => {
+  // Hook này biến thẻ div bình thường thành vật thể "Kéo được"
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: tool.type,
-    data: tool,
+    id: tool.type, //'text', 'email', ...
+    data: tool, //{ label: 'Input Text', icon: ... }
   });
 
+  //Tùy chỉnh tọa độ X, Y khi kéo
   const style = transform
     ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
@@ -29,10 +35,10 @@ const SidebarItem = ({ tool }) => {
 
   return (
     <div
-      ref={setNodeRef}
-      {...listeners}
+      ref={setNodeRef} //Kết nối thẻ div thật (DOM) với logic ảo của React.
+      {...listeners} //Lắng nghe sự kiện chuột/tay của người dùng
       {...attributes}
-      style={style}
+      style={style} //Chứa thông tin vị trí X và Y khi bạn đang kéo
       className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg cursor-grab hover:bg-blue-50 hover:border-blue-500 shadow-sm z-50 touch-none mb-3"
     >
       <span className="text-xl text-gray-600">{tool.icon}</span>
@@ -48,10 +54,10 @@ const Sidebar = () => {
   const tools = [
     { type: "text", label: "Input Text", icon: <BsTextParagraph /> },
     { type: "textarea", label: "Text Area", icon: <BsCardText /> },
-    { type: "name", label: "Full Name", icon: <BsPerson /> }, // Mới
-    { type: "email", label: "Email", icon: <BsEnvelope /> }, // Mới
-    { type: "password", label: "Password", icon: <BsKey /> }, // Mới
-    { type: "phone", label: "Phone Number", icon: <BsTelephone /> }, // Mới
+    { type: "name", label: "Full Name", icon: <BsPerson /> },
+    { type: "email", label: "Email", icon: <BsEnvelope /> },
+    { type: "password", label: "Password", icon: <BsKey /> },
+    { type: "phone", label: "Phone Number", icon: <BsTelephone /> },
     {
       type: "radio",
       label: "Radio Group",

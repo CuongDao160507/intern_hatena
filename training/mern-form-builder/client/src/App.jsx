@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DndContext, closestCorners, DragOverlay } from "@dnd-kit/core"; // Thêm closestCorners
+import { DndContext, closestCorners, handleDragEnd } from "@dnd-kit/core"; // Thêm closestCorners
 import { arrayMove } from "@dnd-kit/sortable"; // Import hàm đổi chỗ mảng
 import { v4 as uuidv4 } from "uuid";
 import { MdAdd, MdClose } from "react-icons/md";
@@ -10,31 +10,40 @@ import TopBar from "./components/TopBar";
 import axiosClient from "./api/axiosClient";
 
 function App() {
+  // Kho chứa danh sách các Tab (Forms). Mặc định có 1 cái form rỗng.
   const [forms, setForms] = useState([
     { id: "form-default", title: "Untitled Form", elements: [] },
   ]);
+  // Con trỏ: Đang xem cái Tab nào? (Lưu ID của tab đó)
   const [activeTabId, setActiveTabId] = useState("form-default");
+
+  // Đang bấm vào phần tử nào để sửa? (Lưu object phần tử đó)
   const [selectedElement, setSelectedElement] = useState(null);
 
+  // Biến phái sinh: Tự động tìm ra dữ liệu của Form đang mở dựa vào ID
   const activeForm = forms.find((f) => f.id === activeTabId);
 
   // --- TAB LOGIC ---
   const addNewTab = () => {
-    const newId = uuidv4();
-    const newForm = { id: newId, title: "New Form", elements: [] };
-    setForms([...forms, newForm]);
-    setActiveTabId(newId);
-    setSelectedElement(null);
+    const newId = uuidv4(); // Tạo ID mới ngẫu nhiên
+    const newForm = { id: newId, title: "New Form", elements: [] }; // Tạo form mới rỗng
+    setForms([...forms, newForm]); // Thêm vào mảng cũ
+    setActiveTabId(newId); // Chuyển màn hình sang tab mới ngay
+    setSelectedElement(null); // Bỏ chọn phần tử cũ (nếu có)
   };
 
   const closeTab = (e, id) => {
+    // QUAN TRỌNG: Chặn click xuyên qua (để không bị kích hoạt tab)
     e.stopPropagation();
+    // Nếu còn đúng 1 tab thì không cho xóa
     if (forms.length === 1) {
       alert("Không thể đóng tab cuối cùng!");
       return;
     }
+    // Lọc bỏ tab cần xóa ra khỏi mảng
     const newForms = forms.filter((f) => f.id !== id);
     setForms(newForms);
+    // Nếu lỡ tay đóng đúng cái tab đang xem, thì tự động nhảy về tab đầu t
     if (activeTabId === id) {
       setActiveTabId(newForms[0].id);
       setSelectedElement(null);
@@ -45,13 +54,16 @@ function App() {
   const updateActiveFormElements = (newElementsCallback) => {
     setForms((prevForms) =>
       prevForms.map((f) => {
+        // Tìm đúng cái form đang mở
         if (f.id === activeTabId) {
           const updatedElements =
             typeof newElementsCallback === "function"
-              ? newElementsCallback(f.elements)
-              : newElementsCallback;
+              ? newElementsCallback(f.elements) // Nếu truyền vào hàm (callback)
+              : newElementsCallback; // Nếu truyền vào giá trị trực tiếp
+          // Trả về form cũ nhưng thay ruột (elements) mới
           return { ...f, elements: updatedElements };
         }
+        // Các form khác giữ nguyên
         return f;
       })
     );
@@ -63,23 +75,25 @@ function App() {
     );
   };
 
-  // --- LOGIC KÉO THẢ MỚI ---
+  // --- LOGIC KÉO THẢ  ---
   const handleDragEnd = (event) => {
     const { active, over } = event;
 
-    // 1. Nếu thả ra ngoài thì thôi
+    // Nếu thả ra ngoài thì thôi
     if (!over) return;
 
-    // 2. LOGIC THÊM MỚI (Kéo từ Sidebar)
-    // Sidebar item có data.current chứa thông tin tool, nhưng không có cờ isSortable
+    // LOGIC THÊM MỚI (Kéo từ Sidebar)
+    // Sidebar item có data.current chứa thông tin tool, nhưng không có isSortable
     if (active.data.current && !active.data.current.isSortable) {
       // Cho phép thả vào vùng trống HOẶC thả đè lên phần tử khác (insert)
+      // Tạo phần tử mới với dữ liệu mặc định
       const newElement = {
         id: uuidv4(),
         type: active.data.current.type,
         label: active.data.current.label,
         required: false,
         placeholder: `Nhập ${active.data.current.label}...`,
+        // Nếu là radio/checkbox thì tạo sẵn options, không thì null
         options: ["radio", "checkbox"].includes(active.data.current.type)
           ? ["Option 1", "Option 2"]
           : null,
@@ -90,15 +104,18 @@ function App() {
       return;
     }
 
-    // 3. LOGIC SẮP XẾP (Kéo trong Canvas)
+    // LOGIC SẮP XẾP (Kéo trong Canvas)
     // Chỉ chạy khi ID khác nhau (vị trí thay đổi)
     if (active.id !== over.id) {
       console.log("🔄 Đang sắp xếp:", active.id, " -> ", over.id);
 
+      // Cập nhật mảng forms
       setForms((prevForms) =>
         prevForms.map((f) => {
           if (f.id === activeTabId) {
+            // Tìm vị trí cũ (index)
             const oldIndex = f.elements.findIndex((el) => el.id === active.id);
+            // Tìm vị trí mới (index)
             const newIndex = f.elements.findIndex((el) => el.id === over.id);
 
             // Bảo vệ: Nếu không tìm thấy index thì không làm gì
@@ -176,7 +193,8 @@ function App() {
   };
 
   return (
-    // Thêm collisionDetection={closestCorners} để tính toán va chạm mượt hơn
+    // DndContext: Lớp vỏ bao bọc để tính toán vật lý kéo thả
+    // closestCorners: Thuật toán giúp kéo thả dạng lưới (Grid) mượt hơn
     <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
       <div className="flex flex-col h-screen w-screen overflow-hidden bg-gray-100">
         <TopBar
@@ -187,7 +205,9 @@ function App() {
 
         {/* TABS AREA */}
         <div className="flex items-center bg-gray-200 border-b border-gray-300 px-2 pt-2 gap-1 overflow-x-auto">
+          {/* Map qua mảng forms để vẽ từng cái Tab */}
           {forms.map((form) => (
+            // ... Giao diện từng tab (tên, nút đóng)
             <div
               key={form.id}
               onClick={() => {
@@ -209,6 +229,7 @@ function App() {
               </button>
             </div>
           ))}
+          {/* Nút dấu cộng thêm tab */}
           <button
             onClick={addNewTab}
             className="p-2 hover:bg-gray-300 rounded-full ml-1 text-gray-600"
@@ -217,9 +238,12 @@ function App() {
           </button>
         </div>
 
+        {/* --- KHU VỰC CHÍNH (3 CỘT) --- */}
         <div className="flex flex-1 overflow-hidden">
+          {/* Cột 1: Công cụ */}
           <Sidebar />
 
+          {/* Cột 2: Giấy vẽ (Nhận elements của form đang active) */}
           <FormCanvas
             elements={activeForm.elements}
             title={activeForm.title}
@@ -228,6 +252,7 @@ function App() {
             selectedId={selectedElement?.id}
           />
 
+          {/* Cột 3: Cài đặt (Chỉ hiện khi selectedElement != null) */}
           {selectedElement && (
             <PropertiesPanel
               selectedElement={selectedElement}

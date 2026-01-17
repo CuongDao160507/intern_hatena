@@ -1,40 +1,46 @@
 import React from "react";
+
+// Hook dùng để tạo vùng thả (droppable)
 import { useDroppable } from "@dnd-kit/core";
+
 // Đổi strategy sang rectSortingStrategy để hỗ trợ Grid (ngang + dọc)
 import {
-  SortableContext,
-  rectSortingStrategy,
-  useSortable,
+  SortableContext, //Quản lý danh sách các vật thể có thể sắp xếp
+  rectSortingStrategy, //sắp xếp theo dạng hình học
+  useSortable, //Hook biến một phần tử con thành vật có thể "Kéo" và "Sắp xếp"
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+
+import { CSS } from "@dnd-kit/utilities"; // Hàm giúp chuyển đổi toạ độ thành CSS
+
+// Import các icon từ react-icons (material)
 import { MdDragIndicator } from "react-icons/md";
 
 const SortableFormElement = ({ element, onSelect, isSelected }) => {
   const {
     attributes,
-    listeners,
+    listeners, // Các sự kiện chuột (onMouseDown, onKeyDown...)
     setNodeRef,
-    transform,
-    transition,
-    isDragging,
+    transform, // Toạ độ di chuyển (x, y)
+    transition, // Hiệu ứng mượt mà
+    isDragging, // Trạng thái: Đang kéo hay không?
   } = useSortable({
     id: element.id,
     data: { ...element, isSortable: true },
   });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Transform.toString(transform), // Dịch chuyển div theo con chuột
     transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 999 : 1,
+    opacity: isDragging ? 0.5 : 1, // Nếu đang kéo thì làm mờ đi (0.5) cho đẹp
+    zIndex: isDragging ? 999 : 1, // Đang kéo thì nổi lên trên cùng
   };
 
-  // --- STYLE QUAN TRỌNG ĐỂ CHIA CỘT ---
-  // 1. Dùng padding (p-2) để tạo khoảng cách giữa các ô thay vì margin
-  // 2. Border và Background chuyển vào thẻ div con bên trong
+  // Dùng padding (p-2) để tạo khoảng cách giữa các ô thay vì margin
+  // wrapperClass: Class cho cái vỏ bao ngoài cùng.
   const wrapperClass = `p-2 transition-all relative group outline-none`;
 
-  // Style cho cái hộp nội dung bên trong
+  // innerCardClass: Class cho cái hộp trắng bên trong.
+  // Logic: Nếu đang được chọn (isSelected) thì viền xanh (blue), còn không thì viền xám.
   const innerCardClass = `h-full border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all bg-white ${
     isSelected
       ? "border-blue-600 ring-2 ring-blue-200"
@@ -108,12 +114,13 @@ const SortableFormElement = ({ element, onSelect, isSelected }) => {
       <div className={innerCardClass}>
         {/* HEADER KÉO THẢ */}
         <div
-          {...attributes}
+          {...attributes} // Chỉ khi cầm vào thanh này mới kéo được
           {...listeners}
           className="bg-gray-100 p-2 flex items-center gap-2 cursor-move border-b border-gray-200 hover:bg-gray-200"
           title="Giữ chuột để kéo"
         >
-          <MdDragIndicator className="text-gray-500" size={20} />
+          {/* Icon 6 chấm */}
+          <MdDragIndicator className="text-gray-500" size={20} />{" "}
           <label className="text-sm font-bold text-gray-700 cursor-pointer flex-1 truncate select-none">
             {element.label}{" "}
             {element.required && <span className="text-red-500">*</span>}
@@ -134,6 +141,7 @@ const FormCanvas = ({
   setSelectedElement,
   selectedId,
 }) => {
+  // Biến vùng này thành vùng "Thả được" (Droppable)
   const { setNodeRef, isOver } = useDroppable({ id: "canvas-droppable" });
 
   return (
@@ -145,7 +153,7 @@ const FormCanvas = ({
         <div className="mb-6 pb-4 border-b border-gray-200">
           <input
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => setTitle(e.target.value)} // Cho phép sửa tên Form
             className="text-3xl font-bold text-gray-800 w-full border-b-2 border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none transition-colors bg-transparent"
             placeholder="Nhập tên Form..."
           />
@@ -153,22 +161,24 @@ const FormCanvas = ({
         </div>
 
         <div
-          ref={setNodeRef}
+          ref={setNodeRef} // Gắn hook Droppable vào đây
           // --- THÊM flex flex-wrap content-start ĐỂ CÁC Ô TỰ DỒN LÊN ---
           className={`min-h-[400px] rounded-lg p-2 transition-colors flex flex-wrap content-start ${
             isOver ? "bg-blue-50 border-2 border-blue-400 border-dashed" : ""
-          }`}
+          }`} // Nếu đang kéo đồ đè lên thì đổi màu nền xanh nhạt
         >
-          {/* Đổi sang rectSortingStrategy (chiến thuật sắp xếp lưới 2D) */}
+          {/* rectSortingStrategy (chiến thuật sắp xếp lưới 2D) */}
           <SortableContext
-            items={elements.map((el) => el.id)}
-            strategy={rectSortingStrategy}
+            items={elements.map((el) => el.id)} // Danh sách ID các phần tử
+            strategy={rectSortingStrategy} // Sắp xếp 2D (Lưới)
           >
             {elements.length === 0 ? (
+              // Nếu chưa có gì thì hiện chữ "Chưa có phần tử nào"
               <div className="w-full h-60 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-lg">
                 <p>Chưa có phần tử nào</p>
               </div>
             ) : (
+              // Nếu có rồi thì Map ra từng cái SortableFormElement
               elements.map((el) => (
                 <SortableFormElement
                   key={el.id}
